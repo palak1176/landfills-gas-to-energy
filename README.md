@@ -45,7 +45,7 @@ The script generates:
 - Total current-year greenhouse gas emission reductions from active projects (MMTCO₂e/year)
 
 ## Usage
-- Download the latest LMOP Database from the EPA Landfill Methane Outreach Program (LMOP).
+- Download the latest EPA Landfill Methane Outreach Program (LMOP) Database from [https://www.epa.gov/lmop/project-and-landfill-data-state](url).
 - Save the Excel file in the same folder as the Python script.
 - Ensure the worksheet containing the project data is named: LMOP Database
 - If needed, replace the filename at the end of the script: print(landfills_gas_to_energy("lmopdataga.xlsx"))
