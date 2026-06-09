@@ -22,14 +22,13 @@ def landfills_gas_to_energy(file_path):
         return None
     
     # Check for required columns and keep only those needed for analysis (but Crystal wants to see all columns in the final output so commenting out for now)
-    columns_to_keep = ['Landfill Name', 'County', 'Current Project Status', "Project Start Date", "Project Shutdown Date", "Project Type Category", "Actual MW Generation",
+    must_have_columns = ['Landfill Name', 'County', 'Current Project Status', "Project Start Date", "Project Shutdown Date", "Project Type Category", "Actual MW Generation",
                        "Current Year Emission Reductions (MMTCO2e/yr) - Direct", "Current Year Emission Reductions (MMTCO2e/yr) - Avoided"] 
 
-    missing_cols = [col for col in columns_to_keep if col not in landfills_gas_to_energy_df.columns]
+    missing_cols = [col for col in must_have_columns if col not in landfills_gas_to_energy_df.columns]
     if missing_cols:
         print(f"Missing columns: {missing_cols}")
         return None
-    landfills_gas_to_energy_df = landfills_gas_to_energy_df[columns_to_keep]
 
      # Clean 'County' column and filter for Atlanta MSA counties
     landfills_gas_to_energy_df['County'] = landfills_gas_to_energy_df['County'].fillna('').str.strip() # can't do title case because of "DeKalb"
@@ -91,9 +90,8 @@ def landfills_gas_to_energy(file_path):
     active_landfills_gas_to_energy_df['Total Current Year Emission Reduction'] = (active_landfills_gas_to_energy_df['Current Year Emission Reductions (MMTCO2e/yr) - Direct'].fillna(0) 
                                                                      + active_landfills_gas_to_energy_df['Current Year Emission Reductions (MMTCO2e/yr) - Avoided'].fillna(0))
     
-    print("\nCurrent Active Landfill Gas-to-Energy Projects:") 
-    print(active_landfills_gas_to_energy_df)
+    print(f"\nTotal Current Year Emission Reduction from Active Landfill Gas-to-Energy Projects in Atlanta MSA: {active_landfills_gas_to_energy_df['Total Current Year Emission Reduction'].sum():.3f} MMTCO₂e/yr") 
 
-    return f"\nTotal Current Year Emission Reduction from Active Landfill Gas-to-Energy Projects in Atlanta MSA: {active_landfills_gas_to_energy_df['Total Current Year Emission Reduction'].sum():.3f} MMTCO₂e/yr"
+    return active_landfills_gas_to_energy_df.to_csv("atlanta_msa_landfill_gas_to_energy_projects.csv", index=False)
 
 print(landfills_gas_to_energy("lmopdataga.xlsx"))
