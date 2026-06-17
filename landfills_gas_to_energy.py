@@ -21,7 +21,7 @@ def landfills_gas_to_energy(file_path):
         print("Error: There was a parsing error while reading the file.")
         return None
     
-    # Check for required columns and keep only those needed for analysis (but Crystal wants to see all columns in the final output so commenting out for now)
+    # Check for required columns
     must_have_columns = ['Landfill Name', 'County', 'Current Project Status', "Project Start Date", "Project Shutdown Date", "Project Type Category", "Actual MW Generation",
                        "Current Year Emission Reductions (MMTCO2e/yr) - Direct", "Current Year Emission Reductions (MMTCO2e/yr) - Avoided"] 
 
@@ -36,7 +36,7 @@ def landfills_gas_to_energy(file_path):
     atlanta_msa_counties_lower = {c.lower() for c in atlanta_msa_counties}
     landfills_gas_to_energy_df = landfills_gas_to_energy_df[landfills_gas_to_energy_df['County'].str.lower().isin(atlanta_msa_counties_lower)]
 
-    # Clean 'Current Project Status' column and filter for Operational, Construction, and Planned projects
+    # Clean 'Current Project Status' column and filter for Operational, Construction, Planned, and Shutdown projects
     landfills_gas_to_energy_df['Current Project Status'] = landfills_gas_to_energy_df['Current Project Status'].fillna('').str.strip().str.lower()
     landfills_gas_to_energy_df = landfills_gas_to_energy_df[landfills_gas_to_energy_df['Current Project Status'].isin(['operational', 'construction', 'planned', 'shutdown'])]    
 
