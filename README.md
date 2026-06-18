@@ -35,7 +35,7 @@ The script expects an Excel workbook containing the EPA LMOP Database sheet with
 - Actual MW Generation
 - Current Year Emission Reductions (MMTCO2e/yr) - Direct
 - Current Year Emission Reductions (MMTCO2e/yr) - Avoided
-The data should be stored in a worksheet named: LMOP Database
+- The data should be stored in a worksheet named: LMOP Database
 
 ## Outputs
 The script generates:
