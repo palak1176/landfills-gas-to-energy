@@ -1,4 +1,5 @@
 import pandas as pd
+import argparse
 
 atlanta_msa_counties = [
     "Barrow", "Clayton", "Douglas", "Haralson", "Meriwether", 
@@ -39,15 +40,8 @@ def landfills_gas_to_energy(file_path):
     # Clean 'Current Project Status' column and filter for Operational, Construction, Planned, and Shutdown projects
     landfills_gas_to_energy_df['Current Project Status'] = landfills_gas_to_energy_df['Current Project Status'].fillna('').str.strip().str.lower()
     landfills_gas_to_energy_df = landfills_gas_to_energy_df[landfills_gas_to_energy_df['Current Project Status'].isin(['operational', 'construction', 'planned', 'shutdown'])]    
-
-    # Calculate and print the number of landfill gas-to-energy sites by type
-    # landfills_gas_to_energy_types = landfills_gas_to_energy_df.groupby('Current Project Status').size().reset_index(name='Count')
-    # print("\nLandfill Gas-to-Energy Sites by Type:")
-    # for _, row in landfills_gas_to_energy_types.iterrows():
-    #     print(f"Type: {row['Current Project Status']}, Count: {row['Count']}")
     
-    # Cumulative count of landfill gas-to-energy projects over time
-
+    '''Cumulative count of landfill gas-to-energy projects over time'''
     # If project shutdown date exists then account for that in the cumulative count by not counting projects that have shut down by the target year. 
     # If shutdown date is missing, assume project is still operational and count it.
     landfills_gas_to_energy_df['Project Start Date'] = pd.to_datetime(landfills_gas_to_energy_df['Project Start Date'],errors='coerce')
@@ -84,7 +78,7 @@ def landfills_gas_to_energy(file_path):
     print(project_gas_to_energy_years.to_string(index=False))
 
     active_landfills_gas_to_energy_df = landfills_gas_to_energy_df[landfills_gas_to_energy_df['Current Project Status'].isin(['operational', 'construction', 'planned']) & landfills_gas_to_energy_df['Project Shutdown Date'].isna()].copy()
-    # create new dataframe for active projects only and need to exclude projects with a shutdown date even if they are marked as operational, construction, or planned
+    # Create new dataframe for active projects only and need to exclude projects with a shutdown date even if they are marked as operational, construction, or planned
     # have to make a copy of the filtered dataframe to avoid SettingWithCopyWarning when creating the new column for total emission reduction
 
     active_landfills_gas_to_energy_df['Total Current Year Emission Reduction'] = (active_landfills_gas_to_energy_df['Current Year Emission Reductions (MMTCO2e/yr) - Direct'].fillna(0) 
@@ -92,6 +86,22 @@ def landfills_gas_to_energy(file_path):
     
     print(f"\nTotal Current Year Emission Reduction from Active Landfill Gas-to-Energy Projects in Atlanta MSA: {active_landfills_gas_to_energy_df['Total Current Year Emission Reduction'].sum():.3f} MMTCO₂e/yr") 
 
-    return active_landfills_gas_to_energy_df.to_csv("atlanta_msa_landfill_gas_to_energy_projects.csv", index=False)
+    output_path = "atlanta_msa_landfill_gas_to_energy_projects.csv"
+    active_landfills_gas_to_energy_df.to_csv(output_path, index=False)
+    print(f"Saved active projects to {output_path}")
+    return active_landfills_gas_to_energy_df
 
-print(landfills_gas_to_energy("lmopdataga.xlsx"))
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Filter the EPA LMOP landfill gas-to-energy database to Atlanta MSA landfills and summarize project growth/emission reductions.")
+    parser.add_argument(
+        "xlsx_path",
+        help="Path to the LMOP database Excel file (e.g. 'lmopdataga.xlsx')")
+    return parser.parse_args()
+
+def main():
+    args = parse_args()
+    landfills_gas_to_energy(args.xlsx_path)
+
+if __name__ == "__main__":
+    main()
